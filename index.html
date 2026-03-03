@@ -815,7 +815,7 @@
             <div class="currency-controls">
                 <div class="exchange-rate">
                     <span id="exchangeRateLabel">英镑汇率:</span>
-                    <input type="number" id="exchangeRate" value="9.2" step="0.01" min="0" readonly>
+                    <input type="number" id="exchangeRate" value="9" step="0.01" min="0" readonly>
                 </div>
                 
                 <div class="action-buttons">
@@ -826,7 +826,7 @@
             <!-- 最后更新时间 -->
             <div class="last-update" id="lastUpdateTime">
                 <span class="last-update-icon">🕒</span>
-                <span>最后更新时间: <span id="updateTimeText">2026年02月07日</span></span>
+                <span>最后更新时间: <span id="updateTimeText">2026年03月03日</span></span>
             </div>
         </div>
         
@@ -1013,7 +1013,7 @@
                 name: '英国',
                 currencySymbol: '£',
                 currencyName: '英镑',
-                exchangeRate: 9.2,
+                exchangeRate: 9,
                 pageTitle: 'eBay定价计算器 - 英国站点',
                 pageSubtitle: '专为eBay英国卖家设计的定价工具，支持不同产品类型的运费计算',
                 resultTitle: '英国站点定价计算结果',
@@ -1290,7 +1290,7 @@
             const purchaseCost = parseFloat(purchaseCostInput.value) || 0;
             const productWeight = parseFloat(productWeightInput.value) || 0;
             const listingPrice = parseFloat(listingPriceInput.value) || 0;
-            const exchangeRate = parseFloat(exchangeRateInput.value) || 9.2;
+            const exchangeRate = parseFloat(exchangeRateInput.value) || 9;
             
             // 获取当前站点的运费规则
             const siteRules = siteConfig[currentSite].shippingRules;
