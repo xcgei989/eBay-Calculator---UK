@@ -1,1423 +1,607 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ebay定价计算器</title>
+<div class="currency-controls">
+    <div class="exchange-rate">
+        <span id="exchangeRateLabel">英镑汇率:</span>
+        <input type="number" id="exchangeRate" value="9" step="0.01" min="0" readonly>
+    </div>
     
-    <!-- Favicon图标 - 修复版本 -->
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMyIDZDMTguNzQ1MiA2IDggMTYuNzQ1MiA4IDMwQzggNDMuMjU0OCAxOC43NDUyIDU0IDMyIDU0QzQ1LjI1NDggNTQgNTYgNDMuMjU0OCA1NiAzMEM1NiAxNi43NDUyIDQ1LjI1NDggNiAzMiA2WiIgZmlsbD0iIzAwNTdCOCIvPgo8cGF0aCBkPSJNMzIgNkMxOC43NDUyIDYgOCAxNi43NDUyIDggMzBDOCA0My4yNTQ4IDE4Ljc0NTIgNTQgMzIgNTRDNDUuMjU0OCA1NCA1NiA0My4yNTQ4IDU2IDMwQzU2IDE2Ljc0NTIgNDUuMjU0OCA2IDMyIDZaTTMyIDQ4QzIxLjUwMDcgNDggMTMgMzkuNDk5MyAxMyAyOUMxMyAxOC41MDA3IDIxLjUwMDcgMTAgMzIgMTBDNDIuNDk5MyAxMCA1MSAxOC41MDA3IDUxIDI5QzUxIDM5LjQ5OTMgNDIuNDk5MyA0OCAzMiA0OFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNy41IDMwSDE4LjVDMTcuMTcxNiAzMCAxNiAyOC44Mjg0IDE2IDI3LjVWMjQuNUMxNiAyMy4xNzE2IDE3LjE3MTYgMjIgMTguNSAyMkg0NS41QzQ2LjgyODQgMjIgNDggMjMuMTcxNiA0OCAyNC41VjI3LjVDNDggMjguODI4NCA0Ni44Mjg0IDMwIDQ1LjUgMzBIMzYuNVY0MkMzNi41IDQzLjM4MjcgMzUuMzgyNyA0NC41IDM0IDQ0LjVIMzBDMjguNjE3MyA0NC41IDI3LjUgNDMuMzgyNyAyNy41IDQyVjMwWiIgZmlsbD0iIzAwNTdCOCIvPgo8cGF0aCBkPSJNMTguNSAyMkgxOEMxNy4xNzE2IDIyIDE2LjUgMjIuNjcxNiAxNi41IDIzLjVWMjQuNUMxNi41IDI1LjMyODQgMTcuMTcxNiAyNiAxOCAyNkgxOC41QzE5LjMyODQgMjYgMjAgMjUuMzI4NCAyMCAyNC41VjIzLjVDMjAgMjIuNjcxNiAxOS4zMjg0IDIyIDE4LjUgMjJaIiBmaWxsPSIjMDA1N0I4Ii8+Cjwvc3ZnPgo=">
+    <div class="action-buttons">
+        <button class="btn btn-reset" id="resetBtn">重置</button>
+    </div>
+</div>
+
+<!-- 最后更新时间 -->
+<div class="last-update" id="lastUpdateTime">
+    <span class="last-update-icon">🕒</span>
+    <span>最后更新时间: <span id="updateTimeText">2026年03月03日</span></span>
+</div>
+</div>
+
+<!-- 主内容区域 -->
+<div class="main-content">
+<!-- 输入区域 -->
+<div class="input-section">
+    <!-- 输入参数标题区域 -->
+    <div class="input-header">
+        <div class="input-title">输入参数</div>
+        
+        <!-- 站点切换按钮 - 移动到输入参数右侧 -->
+        <div class="site-switcher">
+            <button class="site-btn uk active" id="siteUK">英国站点</button>
+            <button class="site-btn de" id="siteDE">德国站点</button>
+        </div>
+    </div>
     
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            background-color: #f5f7fb;
-            color: #333;
-            line-height: 1.5;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* 头部样式 */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 20px 30px;
-            background: linear-gradient(135deg, #0057b8 0%, #003d82 100%);
-            color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 87, 184, 0.2);
-            position: relative;
-        }
-        
-        .title-section h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-        
-        .title-section p {
-            opacity: 0.9;
-            font-size: 15px;
-        }
-        
-        /* 站点切换按钮 - 新的样式 */
-        .site-switcher {
-            display: flex;
-            gap: 10px;
-            margin: 0 0 20px auto; /* 右侧对齐 */
-            justify-content: flex-end;
-        }
-        
-        .site-btn {
-            padding: 10px 20px;
-            border: 2px solid;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 100px;
-            text-align: center;
-        }
-        
-        /* 修复按钮文字颜色显示问题 */
-        .site-btn.active {
-            color: white !important; /* 使用!important确保文字颜色为白色 */
-        }
-        
-        /* 英国站点按钮 - 蓝色主题 */
-        .site-btn.uk {
-            border-color: #1e3c72;
-            background-color: #e8f4ff;
-            color: #1e3c72;
-        }
-        
-        .site-btn.uk.active {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            border-color: #1e3c72;
-            box-shadow: 0 4px 8px rgba(30, 60, 114, 0.3);
-        }
-        
-        .site-btn.uk:hover:not(.active) {
-            background-color: #d0e5ff;
-            transform: translateY(-2px);
-        }
-        
-        /* 德国站点按钮 - 红色主题 */
-        .site-btn.de {
-            border-color: #b71c1c;
-            background-color: #ffebee;
-            color: #b71c1c;
-        }
-        
-        .site-btn.de.active {
-            background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
-            border-color: #b71c1c;
-            box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
-        }
-        
-        .site-btn.de:hover:not(.active) {
-            background-color: #ffcdd2;
-            transform: translateY(-2px);
-        }
-        
-        /* 最后更新时间 */
-        .last-update {
-            position: absolute;
-            bottom: 10px;
-            right: 30px;
-            font-size: 13px;
-            opacity: 0.8;
-            display: flex;
-            align-items: center;
-        }
-        
-        .last-update-icon {
-            margin-right: 6px;
-            font-size: 14px;
-        }
-        
-        .currency-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .exchange-rate {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px 15px;
-            border-radius: 8px;
-        }
-        
-        .exchange-rate span {
-            font-weight: 600;
-            margin-right: 8px;
-        }
-        
-        .exchange-rate input {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 5px 10px;
-            width: 80px;
-            border-radius: 4px;
-            text-align: center;
-            pointer-events: none;
-        }
-        
-        .exchange-rate input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-reset {
-            background-color: #f8f9fa;
-            color: #0057b8;
-        }
-        
-        .btn-refresh {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .btn-reset:hover {
-            background-color: #e9ecef;
-        }
-        
-        .btn-refresh:hover {
-            background-color: #218838;
-        }
-        
-        /* 主要内容区域 */
-        .main-content {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .input-section {
-            flex: 1;
-            background: white;
-            border-radius: 12px;
-            padding: 20px; /* 减少内边距，从25px减少到20px */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            position: relative;
-        }
-        
-        .input-section h2 {
-            color: #0057b8;
-            margin-bottom: 15px; /* 减少底部间距，从20px减少到15px */
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eaeaea;
-            font-size: 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        /* 输入参数标题区域 */
-        .input-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px; /* 减少底部间距，从20px减少到15px */
-        }
-        
-        .input-title {
-            color: #0057b8;
-            font-size: 22px;
-            font-weight: 700;
-        }
-        
-        .input-group {
-            margin-bottom: 18px; /* 减少底部间距，从25px减少到18px */
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px; /* 减少底部间距，从10px减少到8px */
-            font-weight: 700;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        /* 增大输入框填充字体大小 */
-        .input-group input {
-            width: 100%;
-            padding: 16px 15px; /* 增加内边距使输入框更高 */
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 18px; /* 从16px增大到18px */
-            font-weight: 700; /* 从600增加到700，更加粗 */
-            transition: border-color 0.3s;
-            -moz-appearance: textfield;
-            color: #0057b8; /* 使用蓝色字体，更加醒目 */
-        }
-        
-        /* 输入框占位符样式 */
-        .input-group input::placeholder {
-            font-size: 16px; /* 占位符字体也增大 */
-            color: #ccc; /* 修改为更浅的灰色，更符合提示文本 */
-            font-weight: 600; /* 占位符字体加粗 */
-        }
-        
-        /* 输入框占位符在聚焦时的样式 */
-        .input-group input:focus::placeholder {
-            color: #eee; /* 聚焦时占位符颜色更浅，几乎看不见 */
-        }
-        
-        /* 输入框占位符在已输入时的样式 */
-        .input-group input:not(:placeholder-shown) {
-            color: #0057b8; /* 输入后有值时使用蓝色字体 */
-        }
-        
-        /* 输入框占位符在没有输入时的样式 */
-        .input-group input:placeholder-shown {
-            color: #0057b8; /* 保持蓝色，但placeholder显示浅灰色 */
-        }
-        
-        .input-group input::-webkit-outer-spin-button,
-        .input-group input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #0057b8;
-            box-shadow: 0 0 0 3px rgba(0, 87, 184, 0.1);
-            background-color: #f8fafd; /* 聚焦时添加浅色背景 */
-        }
-        
-        .input-hint {
-            font-size: 13px;
-            color: #666;
-            margin-top: 5px; /* 减少顶部间距，从8px减少到5px */
-        }
-        
-        /* 产品类型标签 - 修改为居中和大字体 */
-        .product-types {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px; /* 减少底部间距，从20px减少到15px */
-        }
-        
-        .type-tag {
-            padding: 18px 10px; /* 减少内边距，从20px减少到18px */
-            background-color: #e8f4ff;
-            border-radius: 8px;
-            font-size: 18px;
-            color: #0057b8;
-            font-weight: 700;
-            cursor: pointer;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            transition: all 0.3s;
-            min-height: 60px; /* 减少最小高度，从70px减少到60px */
-        }
-        
-        .type-tag.selected-normal {
-            background-color: #0057b8;
-            color: white;
-        }
-        
-        .type-tag.selected-food {
-            background-color: #ff6b6b;
-            color: white;
-        }
-        
-        .type-tag.selected-battery {
-            background-color: #4cd964;
-            color: white;
-        }
-        
-        /* 国家/产品类型区域 */
-        .country-section {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .country-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        
-        .country-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-        }
-        
-        .country-info {
-            flex: 1;
-        }
-        
-        .country-info h3 {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        
-        .country-info p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        /* 标题右侧提示信息区域 */
-        .header-notices {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-            margin-left: 20px;
-        }
-        
-        .product-type-notice {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-weight: 600;
-            font-size: 14px;
-            text-align: right;
-            min-width: 200px;
-        }
-        
-        /* 修改含电类型的背景颜色，提高可读性 */
-        .product-type-notice.normal {
-            background-color: rgba(232, 244, 255, 0.9);
-            color: #0057b8;
-        }
-        
-        .product-type-notice.food {
-            background-color: rgba(255, 235, 238, 0.9);
-            color: #d32f2f;
-        }
-        
-        /* 修改含电类型：使用更深的背景色和白色文字，提高对比度 */
-        .product-type-notice.battery {
-            background-color: rgba(76, 217, 100, 0.9); /* 保持绿色，但使用白色文字提高对比度 */
-            color: white; /* 改为白色文字，提高可读性 */
-        }
-        
-        .processing-notice {
-            background-color: rgba(255, 243, 205, 0.9);
-            border: 1px solid rgba(255, 234, 167, 0.8);
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-weight: 600;
-            color: #856404;
-            font-size: 13px;
-            text-align: right;
-            display: none;
-        }
-        
-        .country-content {
-            padding: 20px 25px 25px;
-        }
-        
-        /* 三列布局的结果区域 - 确保高度一致 */
-        .results-columns {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            align-items: stretch;
-        }
-        
-        .results-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* 第一列：利润、利润率、刊登价格 */
-        .results-column:first-child {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .results-column:first-child .result-card {
-            flex: 1;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .results-column:first-child .result-card:first-child {
-            flex: 2;
-            background-color: #e8f5e9;
-            border-left-color: #28a745;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .results-column:first-child .result-card:nth-child(2),
-        .results-column:first-child .result-card:nth-child(3) {
-            flex: 1;
-        }
-        
-        /* 第二列：成本相关 */
-        .results-column:nth-child(2) .result-card {
-            flex: 1;
-            margin-bottom: 15px;
-        }
-        
-        /* 第三列：其他信息 */
-        .results-column:last-child .result-card {
-            flex: 1;
-            margin-bottom: 15px;
-        }
-        
-        .result-card {
-            background-color: #f8fafd;
-            border-radius: 8px;
-            padding: 20px;
-            border-left: 4px solid #0057b8;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .result-card.red {
-            border-left-color: #dc3545;
-        }
-        
-        .result-card.green {
-            border-left-color: #28a745;
-        }
-        
-        .result-card.yellow {
-            border-left-color: #ffc107;
-        }
-        
-        .result-card.cyan {
-            border-left-color: #17a2b8;
-        }
-        
-        /* 修改结果标签样式 - 增大并加粗 */
-        .result-label {
-            font-size: 16px;
-            font-weight: 700;
-            color: #444;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* 修改结果数值样式 - 增大并加粗 */
-        .result-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: #222;
-        }
-        
-        /* 隐藏人民币币种符号 */
-        .result-currency {
-            display: none;
-        }
-        
-        /* 利润字体特别大并居中 */
-        .profit-card .result-value {
-            font-size: 56px;
-            font-weight: 900;
-            color: #28a745;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* 利润率字体增大 */
-        .result-value.profit-margin {
-            font-size: 32px;
-            font-weight: 800;
-        }
-        
-        /* 刊登价格字体增大并保持左侧对齐 */
-        .listing-card .result-value {
-            font-size: 36px;
-            font-weight: 800;
-            color: #0057b8;
-            text-align: left; /* 改为左对齐 */
-            display: block; /* 改为块级元素以保持左对齐 */
-        }
-        
-        /* 刊登价格英镑符号样式 - 增大并与数字在同一行 */
-        .listing-price-symbol {
-            font-size: 28px; /* 适当增大 */
-            color: #0057b8;
-            margin-left: 8px; /* 增加左边距 */
-            font-weight: 700;
-        }
-        
-        /* 刊登价格欧元符号样式 */
-        .listing-price-euro {
-            font-size: 28px; /* 适当增大 */
-            color: #0057b8;
-            margin-left: 8px; /* 增加左边距 */
-            font-weight: 700;
-        }
-        
-        .profit-warning {
-            display: inline-flex;
-            align-items: center;
-            color: #dc3545;
-            font-weight: 700;
-            font-size: 14px;
-            margin-top: 8px;
-            padding: 4px 8px;
-            background-color: #ffebee;
-            border-radius: 4px;
-            border-left: 3px solid #dc3545;
-        }
-        
-        .warning-icon {
-            font-size: 18px;
-            margin-right: 8px;
-        }
-        
-        /* 国际运费计算详情区域 - 新增样式 */
-        .shipping-detail {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-top: 10px;
-            border-left: 3px solid #0057b8;
-            font-size: 13px; /* 较小字体 */
-            color: #555;
-            line-height: 1.4;
-        }
-        
-        .shipping-detail-title {
-            font-weight: 700;
-            color: #0057b8;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .shipping-detail-content {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .shipping-rule {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px dashed #e0e0e0;
-        }
-        
-        .shipping-rule:last-child {
-            border-bottom: none;
-        }
-        
-        .shipping-label {
-            font-weight: 600;
-            color: #666;
-            min-width: 120px;
-        }
-        
-        .shipping-value {
-            color: #333;
-            text-align: right;
-            flex: 1;
-        }
-        
-        .shipping-formula {
-            background-color: #f0f7ff;
-            border-radius: 4px;
-            padding: 8px 10px;
-            margin-top: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #0057b8;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 1200px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .results-columns {
-                flex-direction: column;
-            }
-            
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .last-update {
-                position: static;
-                margin-top: 15px;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .country-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .header-notices {
-                align-items: flex-start;
-                margin-left: 0;
-                margin-top: 15px;
-                width: 100%;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .currency-controls {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
-            }
-            
-            .exchange-rate {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .action-buttons {
-                width: 100%;
-            }
-            
-            .action-buttons .btn {
-                flex: 1;
-            }
-            
-            .product-types {
-                flex-direction: column;
-            }
-            
-            .type-tag {
-                min-height: 50px; /* 移动端进一步减少高度 */
-                font-size: 16px;
-            }
-            
-            /* 响应式调整字体大小 */
-            .result-value {
-                font-size: 24px;
-            }
-            
-            .profit-card .result-value {
-                font-size: 40px;
-            }
-            
-            .result-value.profit-margin {
-                font-size: 26px;
-            }
-            
-            .listing-card .result-value {
-                font-size: 28px;
-            }
-            
-            .listing-price-symbol, .listing-price-euro {
-                font-size: 24px;
-            }
-            
-            .result-label {
-                font-size: 14px;
-            }
-            
-            /* 移动端调整输入框字体大小 */
-            .input-group input {
-                font-size: 16px; /* 移动端保持16px */
-                padding: 14px 15px; /* 移动端内边距稍小 */
-            }
-            
-            .input-group input::placeholder {
-                font-size: 14px; /* 移动端占位符字体稍小 */
-            }
-            
-            .header-notices {
-                align-items: center;
-                text-align: center;
-            }
-            
-            .product-type-notice {
-                min-width: auto;
-                width: 100%;
-            }
-            
-            .shipping-detail {
-                padding: 12px 15px;
-                font-size: 12px;
-            }
-            
-            .shipping-rule {
-                flex-direction: column;
-            }
-            
-            .shipping-label {
-                min-width: auto;
-                margin-bottom: 2px;
-            }
-            
-            .shipping-value {
-                text-align: left;
-            }
-            
-            /* 移动端站点切换按钮调整 */
-            .site-switcher {
-                margin: 0 0 20px 0;
-                justify-content: center;
-                width: 100%;
-            }
-            
-            .site-btn {
-                min-width: 80px;
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- 头部区域 -->
-        <div class="header">
-            <div class="title-section">
-                <h1 id="pageTitle">eBay定价计算器 - 英国站点</h1>
-                <p id="pageSubtitle">专为eBay英国卖家设计的定价工具，支持不同产品类型的运费计算</p>
+    <div class="input-group">
+        <label for="purchaseCost">采购成本 (¥)</label>
+        <input type="number" id="purchaseCost" placeholder="0" value="" step="0.01" min="0">
+        <div class="input-hint">产品的采购成本，单位：人民币</div>
+    </div>
+    
+    <div class="input-group">
+        <label for="productWeight">产品重量 (kg)</label>
+        <input type="number" id="productWeight" placeholder="0" value="" step="0.01" min="0">
+        <div class="input-hint">产品的重量，单位：千克</div>
+    </div>
+    
+    <div class="input-group">
+        <label for="listingPrice" id="listingPriceLabel">刊登价格 (£)</label>
+        <input type="number" id="listingPrice" placeholder="0" value="" step="0.01" min="0">
+        <div class="input-hint" id="listingPriceHint">在eBay上刊登的价格，单位：英镑</div>
+    </div>
+    
+    <div class="input-group">
+        <label>产品类型</label>
+        <div class="product-types">
+            <div class="type-tag selected-normal" id="typeNormal">普货</div>
+            <div class="type-tag" id="typeFood">食品/液体/膏体/胶囊</div>
+            <div class="type-tag" id="typeBattery">含电</div>
+        </div>
+        <div class="input-hint">选择产品类型以应用相应的运费规则</div>
+    </div>
+</div>
+
+<!-- 结果区域 -->
+<div class="country-section">
+    <!-- 站点卡片 -->
+    <div class="country-card">
+        <div class="country-header">
+            <div class="country-info">
+                <h3 id="resultTitle">英国站点定价计算结果</h3>
+                <p id="resultSubtitle">基于当前输入参数和产品类型的计算数据</p>
             </div>
             
-            <div class="currency-controls">
-                <div class="exchange-rate">
-                    <span id="exchangeRateLabel">英镑汇率:</span>
-                    <input type="number" id="exchangeRate" value="9" step="0.01" min="0" readonly>
+            <!-- 标题右侧提示信息区域 -->
+            <div class="header-notices">
+                <div class="product-type-notice normal" id="headerProductTypeNotice">
+                    当前产品类型：普货
                 </div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-reset" id="resetBtn">重置</button>
+                <div class="processing-notice" id="headerProcessingNotice">
+                    处理时间：7个工作日
                 </div>
-            </div>
-            
-            <!-- 最后更新时间 -->
-            <div class="last-update" id="lastUpdateTime">
-                <span class="last-update-icon">🕒</span>
-                <span>最后更新时间: <span id="updateTimeText">2026年03月03日</span></span>
             </div>
         </div>
         
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <!-- 输入区域 -->
-            <div class="input-section">
-                <!-- 输入参数标题区域 -->
-                <div class="input-header">
-                    <div class="input-title">输入参数</div>
-                    
-                    <!-- 站点切换按钮 - 移动到输入参数右侧 -->
-                    <div class="site-switcher">
-                        <button class="site-btn uk active" id="siteUK">英国站点</button>
-                        <button class="site-btn de" id="siteDE">德国站点</button>
+        <div class="country-content">
+            <div class="results-columns" id="resultsContainer">
+                <!-- 第一列：利润、利润率、刊登价格 -->
+                <div class="results-column">
+                    <div class="result-card profit-card green">
+                        <div class="result-label">利润</div>
+                        <div class="result-value" id="profitValue">0.00</div>
+                    </div>
+                    <div class="result-card green">
+                        <div class="result-label">利润率</div>
+                        <div class="result-value profit-margin" id="profitMarginValue">0.00%</div>
+                        <div class="profit-warning" id="profitWarning" style="display: none;">
+                            <span class="warning-icon">⚠</span> 利润率低于30%
+                        </div>
+                    </div>
+                    <div class="result-card listing-card">
+                        <div class="result-label" id="listingPriceResultLabel">刊登价格</div>
+                        <div class="result-value" id="listingPriceResult">0.00<span class="listing-price-symbol" id="listingPriceSymbol">£</span></div>
                     </div>
                 </div>
                 
-                <div class="input-group">
-                    <label for="purchaseCost">采购成本 (¥)</label>
-                    <input type="number" id="purchaseCost" placeholder="0" value="" step="0.01" min="0">
-                    <div class="input-hint">产品的采购成本，单位：人民币</div>
-                </div>
-                
-                <div class="input-group">
-                    <label for="productWeight">产品重量 (kg)</label>
-                    <input type="number" id="productWeight" placeholder="0" value="" step="0.01" min="0">
-                    <div class="input-hint">产品的重量，单位：千克</div>
-                </div>
-                
-                <div class="input-group">
-                    <label for="listingPrice" id="listingPriceLabel">刊登价格 (£)</label>
-                    <input type="number" id="listingPrice" placeholder="0" value="" step="0.01" min="0">
-                    <div class="input-hint" id="listingPriceHint">在eBay上刊登的价格，单位：英镑</div>
-                </div>
-                
-                <div class="input-group">
-                    <label>产品类型</label>
-                    <div class="product-types">
-                        <div class="type-tag selected-normal" id="typeNormal">普货</div>
-                        <div class="type-tag" id="typeFood">食品/液体/膏体/胶囊</div>
-                        <div class="type-tag" id="typeBattery">含电</div>
+                <!-- 第二列：成本相关 -->
+                <div class="results-column">
+                    <div class="result-card red">
+                        <div class="result-label">采购成本</div>
+                        <div class="result-value" id="purchaseCostResult">0.00</div>
                     </div>
-                    <div class="input-hint">选择产品类型以应用相应的运费规则</div>
+                    <div class="result-card red">
+                        <div class="result-label">国际物流成本</div>
+                        <div class="result-value" id="shippingCostResult">0.00</div>
+                    </div>
+                    <div class="result-card red">
+                        <div class="result-label">总成本</div>
+                        <div class="result-value" id="totalCostResult">0.00</div>
+                    </div>
+                </div>
+                
+                <!-- 第三列：其他信息 -->
+                <div class="results-column">
+                    <div class="result-card cyan">
+                        <div class="result-label">产品重量</div>
+                        <div class="result-value" id="productWeightResult">0.00 <span style="font-size: 18px; color: #666; margin-left: 4px;">kg</span></div>
+                    </div>
+                    <div class="result-card red">
+                        <div class="result-label">手续费</div>
+                        <div class="result-value" id="ebayFeeResult">0.00</div>
+                    </div>
+                    <!-- 空卡片占位，确保三列高度一致 -->
+                    <div class="result-card" style="visibility: hidden; border-left-color: transparent; background-color: transparent;">
+                        <div class="result-label">占位</div>
+                        <div class="result-value">0.00</div>
+                    </div>
                 </div>
             </div>
             
-            <!-- 结果区域 -->
-            <div class="country-section">
-                <!-- 站点卡片 -->
-                <div class="country-card">
-                    <div class="country-header">
-                        <div class="country-info">
-                            <h3 id="resultTitle">英国站点定价计算结果</h3>
-                            <p id="resultSubtitle">基于当前输入参数和产品类型的计算数据</p>
-                        </div>
-                        
-                        <!-- 标题右侧提示信息区域 -->
-                        <div class="header-notices">
-                            <div class="product-type-notice normal" id="headerProductTypeNotice">
-                                当前产品类型：普货
-                            </div>
-                            <div class="processing-notice" id="headerProcessingNotice">
-                                处理时间：7个工作日
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="country-content">
-                        <div class="results-columns" id="resultsContainer">
-                            <!-- 第一列：利润、利润率、刊登价格 -->
-                            <div class="results-column">
-                                <div class="result-card profit-card green">
-                                    <div class="result-label">利润</div>
-                                    <div class="result-value" id="profitValue">0.00</div>
-                                </div>
-                                <div class="result-card green">
-                                    <div class="result-label">利润率</div>
-                                    <div class="result-value profit-margin" id="profitMarginValue">0.00%</div>
-                                    <div class="profit-warning" id="profitWarning" style="display: none;">
-                                        <span class="warning-icon">⚠</span> 利润率低于30%
-                                    </div>
-                                </div>
-                                <div class="result-card listing-card">
-                                    <div class="result-label" id="listingPriceResultLabel">刊登价格</div>
-                                    <div class="result-value" id="listingPriceResult">0.00<span class="listing-price-symbol" id="listingPriceSymbol">£</span></div>
-                                </div>
-                            </div>
-                            
-                            <!-- 第二列：成本相关 -->
-                            <div class="results-column">
-                                <div class="result-card red">
-                                    <div class="result-label">采购成本</div>
-                                    <div class="result-value" id="purchaseCostResult">0.00</div>
-                                </div>
-                                <div class="result-card red">
-                                    <div class="result-label">国际物流成本</div>
-                                    <div class="result-value" id="shippingCostResult">0.00</div>
-                                </div>
-                                <div class="result-card red">
-                                    <div class="result-label">总成本</div>
-                                    <div class="result-value" id="totalCostResult">0.00</div>
-                                </div>
-                            </div>
-                            
-                            <!-- 第三列：其他信息 -->
-                            <div class="results-column">
-                                <div class="result-card cyan">
-                                    <div class="result-label">产品重量</div>
-                                    <div class="result-value" id="productWeightResult">0.00 <span style="font-size: 18px; color: #666; margin-left: 4px;">kg</span></div>
-                                </div>
-                                <div class="result-card red">
-                                    <div class="result-label">手续费</div>
-                                    <div class="result-value" id="ebayFeeResult">0.00</div>
-                                </div>
-                                <!-- 空卡片占位，确保三列高度一致 -->
-                                <div class="result-card" style="visibility: hidden; border-left-color: transparent; background-color: transparent;">
-                                    <div class="result-label">占位</div>
-                                    <div class="result-value">0.00</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 国际运费计算详情区域 - 新增 -->
-                        <div class="shipping-detail" id="shippingDetail">
-                            <div class="shipping-detail-title">国际运费计算详情</div>
-                            <div class="shipping-detail-content" id="shippingDetailContent">
-                                <!-- 内容将通过JavaScript动态生成 -->
-                            </div>
-                        </div>
-                    </div>
+            <!-- 国际运费计算详情区域 - 新增 -->
+            <div class="shipping-detail" id="shippingDetail">
+                <div class="shipping-detail-title">国际运费计算详情</div>
+                <div class="shipping-detail-content" id="shippingDetailContent">
+                    <!-- 内容将通过JavaScript动态生成 -->
                 </div>
             </div>
         </div>
     </div>
+</div>
+</div>
+</div>
 
-    <script>
-        // 获取DOM元素
-        const purchaseCostInput = document.getElementById('purchaseCost');
-        const productWeightInput = document.getElementById('productWeight');
-        const listingPriceInput = document.getElementById('listingPrice');
-        const exchangeRateInput = document.getElementById('exchangeRate');
-        const resetBtn = document.getElementById('resetBtn');
-        const updateTimeText = document.getElementById('updateTimeText');
-        const siteUKBtn = document.getElementById('siteUK');
-        const siteDEBtn = document.getElementById('siteDE');
-        const pageTitle = document.getElementById('pageTitle');
-        const pageSubtitle = document.getElementById('pageSubtitle');
-        const exchangeRateLabel = document.getElementById('exchangeRateLabel');
-        const listingPriceLabel = document.getElementById('listingPriceLabel');
-        const listingPriceHint = document.getElementById('listingPriceHint');
-        const resultTitle = document.getElementById('resultTitle');
-        const resultSubtitle = document.getElementById('resultSubtitle');
-        const listingPriceResultLabel = document.getElementById('listingPriceResultLabel');
-        const listingPriceSymbol = document.getElementById('listingPriceSymbol');
-        
-        // 结果显示元素
-        const profitValue = document.getElementById('profitValue');
-        const profitMarginValue = document.getElementById('profitMarginValue');
-        const profitWarning = document.getElementById('profitWarning');
-        const purchaseCostResult = document.getElementById('purchaseCostResult');
-        const shippingCostResult = document.getElementById('shippingCostResult');
-        const totalCostResult = document.getElementById('totalCostResult');
-        const productWeightResult = document.getElementById('productWeightResult');
-        const ebayFeeResult = document.getElementById('ebayFeeResult');
-        const listingPriceResult = document.getElementById('listingPriceResult');
-        
-        // 标题右侧提示信息元素
-        const headerProductTypeNotice = document.getElementById('headerProductTypeNotice');
-        const headerProcessingNotice = document.getElementById('headerProcessingNotice');
-        
-        // 国际运费详情元素
-        const shippingDetailContent = document.getElementById('shippingDetailContent');
-        
-        // 当前选中的产品类型
-        let currentProductType = 'normal';
-        
-        // 当前选中的站点
-        let currentSite = 'uk';
-        
-        // 站点配置
-        const siteConfig = {
-            uk: {
-                name: '英国',
-                currencySymbol: '£',
-                currencyName: '英镑',
-                exchangeRate: 9,
-                pageTitle: 'eBay定价计算器 - 英国站点',
-                pageSubtitle: '专为eBay英国卖家设计的定价工具，支持不同产品类型的运费计算',
-                resultTitle: '英国站点定价计算结果',
-                resultSubtitle: '基于当前输入参数和产品类型的计算数据',
-                shippingRules: {
-                    normal: {
-                        name: '普货',
-                        colorClass: 'normal',
-                        rules: [
-                            { 
-                                maxWeight: 0.2, 
-                                formula: (weight) => 90 * weight + 17.6,
-                                description: "重量 ≤ 0.2kg",
-                                formulaText: "90 × 重量 + 17.6"
-                            },
-                            { 
-                                minWeight: 0.2, 
-                                formula: (weight) => 46 * weight + 16 + 11,
-                                description: "重量 ≥ 0.2kg",
-                                formulaText: "46 × 重量 + 16 + 11"
-                            }
-                        ]
-                    },
-                    food: {
-                        name: '食品/液体/膏体/胶囊',
-                        colorClass: 'food',
-                        rules: [
-                            { 
-                                maxWeight: 0.3, 
-                                formula: (weight) => 73 * weight + 16 + 11,
-                                description: "重量 < 0.3kg",
-                                formulaText: "73 × 重量 + 16 + 11"
-                            },
-                            { 
-                                minWeight: 0.3,
-                                maxWeight: 5,
-                                formula: (weight) => 74 * weight + 16 + 11,
-                                description: "0.3kg ≤ 重量 ≤ 5kg",
-                                formulaText: "74 × 重量 + 16 + 11"
-                            }
-                        ]
-                    },
-                    battery: {
-                        name: '含电',
-                        colorClass: 'battery',
-                        rules: [
-                            { 
-                                maxWeight: 0.23, 
-                                formula: (weight) => 90 * weight + 17.6,
-                                description: "重量 ≤ 0.23kg",
-                                formulaText: "90 × 重量 + 17.6"
-                            },
-                            { 
-                                minWeight: 0.23, 
-                                formula: (weight) => 55 * weight + 16 + 11,
-                                description: "重量 ≥ 0.23kg",
-                                formulaText: "55 × 重量 + 16 + 11"
-                            }
-                        ]
-                    }
+<script>
+// 获取DOM元素
+const purchaseCostInput = document.getElementById('purchaseCost');
+const productWeightInput = document.getElementById('productWeight');
+const listingPriceInput = document.getElementById('listingPrice');
+const exchangeRateInput = document.getElementById('exchangeRate');
+const resetBtn = document.getElementById('resetBtn');
+const updateTimeText = document.getElementById('updateTimeText');
+const siteUKBtn = document.getElementById('siteUK');
+const siteDEBtn = document.getElementById('siteDE');
+const pageTitle = document.getElementById('pageTitle');
+const pageSubtitle = document.getElementById('pageSubtitle');
+const exchangeRateLabel = document.getElementById('exchangeRateLabel');
+const listingPriceLabel = document.getElementById('listingPriceLabel');
+const listingPriceHint = document.getElementById('listingPriceHint');
+const resultTitle = document.getElementById('resultTitle');
+const resultSubtitle = document.getElementById('resultSubtitle');
+const listingPriceResultLabel = document.getElementById('listingPriceResultLabel');
+const listingPriceSymbol = document.getElementById('listingPriceSymbol');
+
+// 结果显示元素
+const profitValue = document.getElementById('profitValue');
+const profitMarginValue = document.getElementById('profitMarginValue');
+const profitWarning = document.getElementById('profitWarning');
+const purchaseCostResult = document.getElementById('purchaseCostResult');
+const shippingCostResult = document.getElementById('shippingCostResult');
+const totalCostResult = document.getElementById('totalCostResult');
+const productWeightResult = document.getElementById('productWeightResult');
+const ebayFeeResult = document.getElementById('ebayFeeResult');
+const listingPriceResult = document.getElementById('listingPriceResult');
+
+// 标题右侧提示信息元素
+const headerProductTypeNotice = document.getElementById('headerProductTypeNotice');
+const headerProcessingNotice = document.getElementById('headerProcessingNotice');
+
+// 国际运费详情元素
+const shippingDetailContent = document.getElementById('shippingDetailContent');
+
+// 当前选中的产品类型
+let currentProductType = 'normal';
+
+// 当前选中的站点
+let currentSite = 'uk';
+
+// 站点配置
+const siteConfig = {
+uk: {
+    name: '英国',
+    currencySymbol: '£',
+    currencyName: '英镑',
+    exchangeRate: 9,
+    pageTitle: 'eBay定价计算器 - 英国站点',
+    pageSubtitle: '专为eBay英国卖家设计的定价工具，支持不同产品类型的运费计算',
+    resultTitle: '英国站点定价计算结果',
+    resultSubtitle: '基于当前输入参数和产品类型的计算数据',
+    shippingRules: {
+        normal: {
+            name: '普货',
+            colorClass: 'normal',
+            rules: [
+                { 
+                    maxWeight: 0.2, 
+                    formula: (weight) => 90 * weight + 17.6,
+                    description: "重量 ≤ 0.2kg",
+                    formulaText: "90 × 重量 + 17.6"
+                },
+                { 
+                    minWeight: 0.2, 
+                    formula: (weight) => 46 * weight + 16 + 11,
+                    description: "重量 ≥ 0.2kg",
+                    formulaText: "46 × 重量 + 16 + 11"
                 }
-            },
-            de: {
-                name: '德国',
-                currencySymbol: '€',
-                currencyName: '欧元',
-                exchangeRate: 8.0,
-                pageTitle: 'eBay定价计算器 - 德国站点',
-                pageSubtitle: '专为eBay德国卖家设计的定价工具，支持不同产品类型的运费计算',
-                resultTitle: '德国站点定价计算结果',
-                resultSubtitle: '基于当前输入参数和产品类型的计算数据',
-                shippingRules: {
-                    normal: {
-                        name: '普货',
-                        colorClass: 'normal',
-                        rules: [
-                            { 
-                                maxWeight: 0.25, 
-                                formula: (weight) => 127.7 * weight + 18.1,
-                                description: "重量 ≤ 0.25kg",
-                                formulaText: "127.7 × 重量 + 18.1"
-                            },
-                            { 
-                                minWeight: 0.25, 
-                                formula: (weight) => 56 * weight + 25 + 11,
-                                description: "重量 ≥ 0.25kg",
-                                formulaText: "56 × 重量 + 25 + 11"
-                            }
-                        ]
-                    },
-                    food: {
-                        name: '食品/液体/膏体/胶囊',
-                        colorClass: 'food',
-                        rules: [
-                            { 
-                                maxWeight: 0.3, 
-                                formula: (weight) => 74 * weight + 25 + 11,
-                                description: "重量 ≤ 0.3kg",
-                                formulaText: "74 × 重量 + 25 + 11"
-                            },
-                            { 
-                                minWeight: 0.3,
-                                maxWeight: 1,
-                                formula: (weight) => 76 * weight + 25 + 11,
-                                description: "0.3kg < 重量 ≤ 1kg",
-                                formulaText: "76 × 重量 + 25 + 11"
-                            },
-                            { 
-                                minWeight: 1,
-                                maxWeight: 2,
-                                formula: (weight) => 78 * weight + 24 + 11,
-                                description: "1kg < 重量 ≤ 2kg",
-                                formulaText: "78 × 重量 + 24 + 11"
-                            }
-                        ]
-                    },
-                    battery: {
-                        name: '含电',
-                        colorClass: 'battery',
-                        rules: [
-                            { 
-                                maxWeight: 0.24, 
-                                formula: (weight) => 127.7 * weight + 18.1,
-                                description: "重量 ≤ 0.24kg",
-                                formulaText: "127.7 × 重量 + 18.1"
-                            },
-                            { 
-                                minWeight: 0.24,
-                                maxWeight: 0.3,
-                                formula: (weight) => 64 * weight + 22 + 11,
-                                description: "0.24kg < 重量 ≤ 0.3kg",
-                                formulaText: "64 × 重量 + 22 + 11"
-                            },
-                            { 
-                                minWeight: 0.3,
-                                maxWeight: 2,
-                                formula: (weight) => 70 * weight + 22 + 11,
-                                description: "0.3kg < 重量 ≤ 2kg",
-                                formulaText: "70 × 重量 + 22 + 11"
-                            }
-                        ]
-                    }
+            ]
+        },
+        food: {
+            name: '食品/液体/膏体/胶囊',
+            colorClass: 'food',
+            rules: [
+                { 
+                    maxWeight: 0.3, 
+                    formula: (weight) => 73 * weight + 16 + 11,
+                    description: "重量 < 0.3kg",
+                    formulaText: "73 × 重量 + 16 + 11"
+                },
+                { 
+                    minWeight: 0.3,
+                    maxWeight: 5,
+                    formula: (weight) => 74 * weight + 16 + 11,
+                    description: "0.3kg ≤ 重量 ≤ 5kg",
+                    formulaText: "74 × 重量 + 16 + 11"
                 }
-            }
-        };
-        
-        // 站点切换
-        siteUKBtn.addEventListener('click', function() {
-            switchSite('uk');
-        });
-        
-        siteDEBtn.addEventListener('click', function() {
-            switchSite('de');
-        });
-        
-        // 切换站点函数
-        function switchSite(site) {
-            currentSite = site;
-            
-            // 更新站点按钮状态
-            siteUKBtn.classList.toggle('active', site === 'uk');
-            siteDEBtn.classList.toggle('active', site === 'de');
-            
-            // 更新页面元素
-            const config = siteConfig[site];
-            pageTitle.textContent = config.pageTitle;
-            pageSubtitle.textContent = config.pageSubtitle;
-            exchangeRateLabel.textContent = `${config.currencyName}汇率:`;
-            exchangeRateInput.value = config.exchangeRate;
-            listingPriceLabel.textContent = `刊登价格 (${config.currencySymbol})`;
-            listingPriceHint.textContent = `在eBay上刊登的价格，单位：${config.currencyName}`;
-            resultTitle.textContent = config.resultTitle;
-            resultSubtitle.textContent = config.resultSubtitle;
-            listingPriceResultLabel.textContent = '刊登价格';
-            listingPriceSymbol.textContent = config.currencySymbol;
-            listingPriceSymbol.className = site === 'uk' ? 'listing-price-symbol' : 'listing-price-euro';
-            
-            // 更新文档标题
-            document.title = `Ebay定价计算器 - ${config.name}站点`;
-            
-            // 重新计算
-            calculatePricing();
-        }
-        
-        // 产品类型选择
-        document.querySelectorAll('.type-tag').forEach(tag => {
-            tag.addEventListener('click', function() {
-                // 移除所有选中状态
-                document.querySelectorAll('.type-tag').forEach(t => {
-                    t.classList.remove('selected-normal', 'selected-food', 'selected-battery');
-                });
-                
-                // 更新当前产品类型
-                if (this.id === 'typeNormal') {
-                    currentProductType = 'normal';
-                    this.classList.add('selected-normal');
-                } else if (this.id === 'typeFood') {
-                    currentProductType = 'food';
-                    this.classList.add('selected-food');
-                } else if (this.id === 'typeBattery') {
-                    currentProductType = 'battery';
-                    this.classList.add('selected-battery');
+            ]
+        },
+        battery: {
+            name: '含电',
+            colorClass: 'battery',
+            rules: [
+                { 
+                    maxWeight: 0.23, 
+                    formula: (weight) => 90 * weight + 17.6,
+                    description: "重量 ≤ 0.23kg",
+                    formulaText: "90 × 重量 + 17.6"
+                },
+                { 
+                    minWeight: 0.23, 
+                    formula: (weight) => 55 * weight + 16 + 11,
+                    description: "重量 ≥ 0.23kg",
+                    formulaText: "55 × 重量 + 16 + 11"
                 }
-                
-                // 更新产品类型提醒
-                updateProductTypeReminder();
-                
-                // 重新计算
-                calculatePricing();
-            });
-        });
-        
-        // 更新产品类型提醒
-        function updateProductTypeReminder() {
-            const productType = siteConfig[currentSite].shippingRules[currentProductType];
-            headerProductTypeNotice.textContent = `当前产品类型：${productType.name}`;
-            headerProductTypeNotice.className = `product-type-notice ${productType.colorClass}`;
-            
-            // 显示或隐藏处理时间提醒
-            if (currentProductType === 'food' || currentProductType === 'battery') {
-                headerProcessingNotice.style.display = 'block';
-            } else {
-                headerProcessingNotice.style.display = 'none';
-            }
+            ]
         }
-        
-        // 重置按钮事件
-        resetBtn.addEventListener('click', function() {
-            // 清空输入框，只显示placeholder
-            purchaseCostInput.value = '';
-            productWeightInput.value = '';
-            listingPriceInput.value = '';
-            calculatePricing();
-        });
-        
-        // 为输入框添加自动选中文本功能
-        [purchaseCostInput, productWeightInput, listingPriceInput].forEach(input => {
-            // 焦点事件：选中所有文本
-            input.addEventListener('focus', function() {
-                this.select();
-            });
-            
-            // 输入事件：当用户开始输入时，自动清除placeholder效果
-            input.addEventListener('input', function() {
-                // 输入时不需要特殊处理，因为输入后会覆盖placeholder
-            });
-            
-            // 失去焦点事件：如果值为空，显示placeholder
-            input.addEventListener('blur', function() {
-                // 不需要特殊处理，placeholder会自动显示
-            });
-        });
-        
-        // 输入变化时实时计算（使用debounce减少计算频率）
-        let calculateTimeout;
-        function scheduleCalculation() {
-            clearTimeout(calculateTimeout);
-            calculateTimeout = setTimeout(() => {
-                calculatePricing();
-            }, 50);
-        }
-        
-        purchaseCostInput.addEventListener('input', scheduleCalculation);
-        productWeightInput.addEventListener('input', scheduleCalculation);
-        listingPriceInput.addEventListener('input', scheduleCalculation);
-        
-        // 初始计算
-        updateProductTypeReminder();
-        calculatePricing();
-        
-        // 计算定价函数
-        function calculatePricing() {
-            // 获取输入值，如果为空则视为0
-            const purchaseCost = parseFloat(purchaseCostInput.value) || 0;
-            const productWeight = parseFloat(productWeightInput.value) || 0;
-            const listingPrice = parseFloat(listingPriceInput.value) || 0;
-            const exchangeRate = parseFloat(exchangeRateInput.value) || 9;
-            
-            // 获取当前站点的运费规则
-            const siteRules = siteConfig[currentSite].shippingRules;
-            const productType = siteRules[currentProductType];
-            
-            // 计算国际运费
-            let shippingCost = 0;
-            let selectedRule = null;
-            let calculationDetails = '';
-            
-            for (const rule of productType.rules) {
-                let matches = false;
-                
-                if (rule.maxWeight !== undefined && rule.minWeight !== undefined) {
-                    // 有最小值和最大值范围
-                    if (productWeight > rule.minWeight && productWeight <= rule.maxWeight) {
-                        matches = true;
-                    }
-                } else if (rule.maxWeight !== undefined && productWeight <= rule.maxWeight) {
-                    // 只有最大值限制
-                    matches = true;
-                } else if (rule.minWeight !== undefined && productWeight >= rule.minWeight) {
-                    // 只有最小值限制
-                    matches = true;
+    }
+},
+de: {
+    name: '德国',
+    currencySymbol: '€',
+    currencyName: '欧元',
+    exchangeRate: 7.8,
+    pageTitle: 'eBay定价计算器 - 德国站点',
+    pageSubtitle: '专为eBay德国卖家设计的定价工具，支持不同产品类型的运费计算',
+    resultTitle: '德国站点定价计算结果',
+    resultSubtitle: '基于当前输入参数和产品类型的计算数据',
+    shippingRules: {
+        normal: {
+            name: '普货',
+            colorClass: 'normal',
+            rules: [
+                { 
+                    maxWeight: 0.25, 
+                    formula: (weight) => 127.7 * weight + 18.1,
+                    description: "重量 ≤ 0.25kg",
+                    formulaText: "127.7 × 重量 + 18.1"
+                },
+                { 
+                    minWeight: 0.25, 
+                    formula: (weight) => 56 * weight + 25 + 11,
+                    description: "重量 ≥ 0.25kg",
+                    formulaText: "56 × 重量 + 25 + 11"
                 }
-                
-                if (matches) {
-                    shippingCost = rule.formula(productWeight);
-                    selectedRule = rule;
-                    calculationDetails = `${rule.formulaText.replace('重量', productWeight.toFixed(2))} = ${shippingCost.toFixed(2)}`;
-                    break;
+            ]
+        },
+        food: {
+            name: '食品/液体/膏体/胶囊',
+            colorClass: 'food',
+            rules: [
+                { 
+                    maxWeight: 0.3, 
+                    formula: (weight) => 74 * weight + 25 + 11,
+                    description: "重量 ≤ 0.3kg",
+                    formulaText: "74 × 重量 + 25 + 11"
+                },
+                { 
+                    minWeight: 0.3,
+                    maxWeight: 1,
+                    formula: (weight) => 76 * weight + 25 + 11,
+                    description: "0.3kg < 重量 ≤ 1kg",
+                    formulaText: "76 × 重量 + 25 + 11"
+                },
+                { 
+                    minWeight: 1,
+                    maxWeight: 2,
+                    formula: (weight) => 78 * weight + 24 + 11,
+                    description: "1kg < 重量 ≤ 2kg",
+                    formulaText: "78 × 重量 + 24 + 11"
                 }
-            }
-            
-            // 如果没有匹配的规则，使用最后一个规则
-            if (shippingCost === 0 && productType.rules.length > 0) {
-                const lastRule = productType.rules[productType.rules.length - 1];
-                shippingCost = lastRule.formula(productWeight);
-                selectedRule = lastRule;
-                calculationDetails = `${lastRule.formulaText.replace('重量', productWeight.toFixed(2))} = ${shippingCost.toFixed(2)}`;
-            }
-            
-            // 计算其他值
-            const listingPriceRMB = listingPrice * exchangeRate;
-            const ebayFee = listingPriceRMB * 0.22;
-            const totalCost = purchaseCost + shippingCost;
-            const profit = listingPriceRMB - ebayFee - totalCost;
-            const profitRate = listingPriceRMB - ebayFee > 0 ? (profit / (listingPriceRMB - ebayFee)) * 100 : 0;
-            
-            // 更新结果显示
-            purchaseCostResult.innerHTML = purchaseCost.toFixed(2);
-            productWeightResult.innerHTML = productWeight.toFixed(2) + ' <span style="font-size: 18px; color: #666; margin-left: 4px;">kg</span>';
-            listingPriceResult.innerHTML = listingPrice.toFixed(2) + '<span class="' + (currentSite === 'uk' ? 'listing-price-symbol' : 'listing-price-euro') + '">' + siteConfig[currentSite].currencySymbol + '</span>';
-            shippingCostResult.innerHTML = shippingCost.toFixed(2);
-            ebayFeeResult.innerHTML = ebayFee.toFixed(2);
-            totalCostResult.innerHTML = totalCost.toFixed(2);
-            
-            // 利润显示
-            profitValue.innerHTML = profit.toFixed(2);
-            profitMarginValue.textContent = profitRate.toFixed(2) + '%';
-            
-            // 检查利润率是否低于30% - 现在放在利润率下面
-            if (profitRate < 30 && profitRate >= 0) {
-                profitWarning.style.display = 'flex';
-                profitMarginValue.style.color = '#dc3545';
-            } else if (profitRate < 0) {
-                profitWarning.style.display = 'none';
-                profitMarginValue.style.color = '#dc3545';
-            } else {
-                profitWarning.style.display = 'none';
-                profitMarginValue.style.color = '#28a745';
-            }
-            
-            // 利润颜色设置
-            if (profit >= 0) {
-                profitValue.style.color = '#28a745';
-            } else {
-                profitValue.style.color = '#dc3545';
-            }
-            
-            // 更新国际运费计算详情
-            updateShippingDetail(productType, productWeight, shippingCost, selectedRule, calculationDetails);
+            ]
+        },
+        battery: {
+            name: '含电',
+            colorClass: 'battery',
+            rules: [
+                { 
+                    maxWeight: 0.24, 
+                    formula: (weight) => 127.7 * weight + 18.1,
+                    description: "重量 ≤ 0.24kg",
+                    formulaText: "127.7 × 重量 + 18.1"
+                },
+                { 
+                    minWeight: 0.24,
+                    maxWeight: 0.3,
+                    formula: (weight) => 64 * weight + 22 + 11,
+                    description: "0.24kg < 重量 ≤ 0.3kg",
+                    formulaText: "64 × 重量 + 22 + 11"
+                },
+                { 
+                    minWeight: 0.3,
+                    maxWeight: 2,
+                    formula: (weight) => 70 * weight + 22 + 11,
+                    description: "0.3kg < 重量 ≤ 2kg",
+                    formulaText: "70 × 重量 + 22 + 11"
+                }
+            ]
         }
-        
-        // 更新国际运费计算详情
-        function updateShippingDetail(productType, productWeight, shippingCost, selectedRule, calculationDetails) {
-            if (!selectedRule) return;
-            
-            let html = `
-                <div class="shipping-rule">
-                    <div class="shipping-label">产品类型：</div>
-                    <div class="shipping-value">${productType.name}</div>
-                </div>
-                <div class="shipping-rule">
-                    <div class="shipping-label">产品重量：</div>
-                    <div class="shipping-value">${productWeight.toFixed(2)} kg</div>
-                </div>
-                <div class="shipping-rule">
-                    <div class="shipping-label">适用规则：</div>
-                    <div class="shipping-value">${selectedRule.description}</div>
-                </div>
-                <div class="shipping-rule">
-                    <div class="shipping-label">运费公式：</div>
-                    <div class="shipping-value">${selectedRule.formulaText}</div>
-                </div>
-            `;
-            
-            if (calculationDetails) {
-                html += `
-                    <div class="shipping-formula">
-                        计算过程：${calculationDetails}
-                    </div>
-                `;
-            }
-            
-            html += `
-                <div class="shipping-rule">
-                    <div class="shipping-label">国际运费：</div>
-                    <div class="shipping-value" style="font-weight: 700; color: #0057b8;">${shippingCost.toFixed(2)} 人民币</div>
-                </div>
-            `;
-            
-            shippingDetailContent.innerHTML = html;
+    }
+}
+};
+
+// 站点切换
+siteUKBtn.addEventListener('click', function() {
+switchSite('uk');
+});
+
+siteDEBtn.addEventListener('click', function() {
+switchSite('de');
+});
+
+// 切换站点函数
+function switchSite(site) {
+currentSite = site;
+
+// 更新站点按钮状态
+siteUKBtn.classList.toggle('active', site === 'uk');
+siteDEBtn.classList.toggle('active', site === 'de');
+
+// 更新页面元素
+const config = siteConfig[site];
+pageTitle.textContent = config.pageTitle;
+pageSubtitle.textContent = config.pageSubtitle;
+exchangeRateLabel.textContent = `${config.currencyName}汇率:`;
+exchangeRateInput.value = config.exchangeRate;
+listingPriceLabel.textContent = `刊登价格 (${config.currencySymbol})`;
+listingPriceHint.textContent = `在eBay上刊登的价格，单位：${config.currencyName}`;
+resultTitle.textContent = config.resultTitle;
+resultSubtitle.textContent = config.resultSubtitle;
+listingPriceResultLabel.textContent = '刊登价格';
+listingPriceSymbol.textContent = config.currencySymbol;
+listingPriceSymbol.className = site === 'uk' ? 'listing-price-symbol' : 'listing-price-euro';
+
+// 更新文档标题
+document.title = `Ebay定价计算器 - ${config.name}站点`;
+
+// 重新计算
+calculatePricing();
+}
+
+// 产品类型选择
+document.querySelectorAll('.type-tag').forEach(tag => {
+tag.addEventListener('click', function() {
+    // 移除所有选中状态
+    document.querySelectorAll('.type-tag').forEach(t => {
+        t.classList.remove('selected-normal', 'selected-food', 'selected-battery');
+    });
+    
+    // 更新当前产品类型
+    if (this.id === 'typeNormal') {
+        currentProductType = 'normal';
+        this.classList.add('selected-normal');
+    } else if (this.id === 'typeFood') {
+        currentProductType = 'food';
+        this.classList.add('selected-food');
+    } else if (this.id === 'typeBattery') {
+        currentProductType = 'battery';
+        this.classList.add('selected-battery');
+    }
+    
+    // 更新产品类型提醒
+    updateProductTypeReminder();
+    
+    // 重新计算
+    calculatePricing();
+});
+});
+
+// 更新产品类型提醒
+function updateProductTypeReminder() {
+const productType = siteConfig[currentSite].shippingRules[currentProductType];
+headerProductTypeNotice.textContent = `当前产品类型：${productType.name}`;
+headerProductTypeNotice.className = `product-type-notice ${productType.colorClass}`;
+
+// 显示或隐藏处理时间提醒
+if (currentProductType === 'food' || currentProductType === 'battery') {
+    headerProcessingNotice.style.display = 'block';
+} else {
+    headerProcessingNotice.style.display = 'none';
+}
+}
+
+// 重置按钮事件
+resetBtn.addEventListener('click', function() {
+// 清空输入框，只显示placeholder
+purchaseCostInput.value = '';
+productWeightInput.value = '';
+listingPriceInput.value = '';
+calculatePricing();
+});
+
+// 为输入框添加自动选中文本功能
+[purchaseCostInput, productWeightInput, listingPriceInput].forEach(input => {
+// 焦点事件：选中所有文本
+input.addEventListener('focus', function() {
+    this.select();
+});
+
+// 输入事件：当用户开始输入时，自动清除placeholder效果
+input.addEventListener('input', function() {
+    // 输入时不需要特殊处理，因为输入后会覆盖placeholder
+});
+
+// 失去焦点事件：如果值为空，显示placeholder
+input.addEventListener('blur', function() {
+    // 不需要特殊处理，placeholder会自动显示
+});
+});
+
+// 输入变化时实时计算（使用debounce减少计算频率）
+let calculateTimeout;
+function scheduleCalculation() {
+clearTimeout(calculateTimeout);
+calculateTimeout = setTimeout(() => {
+    calculatePricing();
+}, 50);
+}
+
+purchaseCostInput.addEventListener('input', scheduleCalculation);
+productWeightInput.addEventListener('input', scheduleCalculation);
+listingPriceInput.addEventListener('input', scheduleCalculation);
+
+// 初始计算
+updateProductTypeReminder();
+calculatePricing();
+
+// 计算定价函数
+function calculatePricing() {
+// 获取输入值，如果为空则视为0
+const purchaseCost = parseFloat(purchaseCostInput.value) || 0;
+const productWeight = parseFloat(productWeightInput.value) || 0;
+const listingPrice = parseFloat(listingPriceInput.value) || 0;
+const exchangeRate = parseFloat(exchangeRateInput.value) || 9;
+
+// 获取当前站点的运费规则
+const siteRules = siteConfig[currentSite].shippingRules;
+const productType = siteRules[currentProductType];
+
+// 计算国际运费
+let shippingCost = 0;
+let selectedRule = null;
+let calculationDetails = '';
+
+for (const rule of productType.rules) {
+    let matches = false;
+    
+    if (rule.maxWeight !== undefined && rule.minWeight !== undefined) {
+        // 有最小值和最大值范围
+        if (productWeight > rule.minWeight && productWeight <= rule.maxWeight) {
+            matches = true;
         }
-        
-        // 初始化：设置英国站点为默认
-        switchSite('uk');
-    </script>
-</body>
-</html>
+    } else if (rule.maxWeight !== undefined && productWeight <= rule.maxWeight) {
+        // 只有最大值限制
+        matches = true;
+    } else if (rule.minWeight !== undefined && productWeight >= rule.minWeight) {
+        // 只有最小值限制
+        matches = true;
+    }
+    
+    if (matches) {
+        shippingCost = rule.formula(productWeight);
+        selectedRule = rule;
+        calculationDetails = `${rule.formulaText.replace('重量', productWeight.toFixed(2))} = ${shippingCost.toFixed(2)}`;
+        break;
+    }
+}
+
+// 如果没有匹配的规则，使用最后一个规则
+if (shippingCost === 0 && productType.rules.length > 0) {
+    const lastRule = productType.rules[productType.rules.length - 1];
+    shippingCost = lastRule.formula(productWeight);
+    selectedRule = lastRule;
+    calculationDetails = `${lastRule.formulaText.replace('重量', productWeight.toFixed(2))} = ${shippingCost.toFixed(2)}`;
+}
+
+// 计算其他值
+const listingPriceRMB = listingPrice * exchangeRate;
+const ebayFee = listingPriceRMB * 0.22;
+const totalCost = purchaseCost + shippingCost;
+const profit = listingPriceRMB - ebayFee - totalCost;
+const profitRate = listingPriceRMB - ebayFee > 0 ? (profit / (listingPriceRMB - ebayFee)) * 100 : 0;
+
+// 更新结果显示
+purchaseCostResult.innerHTML = purchaseCost.toFixed(2);
+productWeightResult.innerHTML = productWeight.toFixed(2) + ' <span style="font-size: 18px; color: #666; margin-left: 4px;">kg</span>';
+listingPriceResult.innerHTML = listingPrice.toFixed(2) + '<span class="' + (currentSite === 'uk' ? 'listing-price-symbol' : 'listing-price-euro') + '">' + siteConfig[currentSite].currencySymbol + '</span>';
+shippingCostResult.innerHTML = shippingCost.toFixed(2);
+ebayFeeResult.innerHTML = ebayFee.toFixed(2);
+totalCostResult.innerHTML = totalCost.toFixed(2);
+
+// 利润显示
+profitValue.innerHTML = profit.toFixed(2);
+profitMarginValue.textContent = profitRate.toFixed(2) + '%';
+
+// 检查利润率是否低于30% - 现在放在利润率下面
+if (profitRate < 30 && profitRate >= 0) {
+    profitWarning.style.display = 'flex';
+    profitMarginValue.style.color = '#dc3545';
+} else if (profitRate < 0) {
+    profitWarning.style.display = 'none';
+    profitMarginValue.style.color = '#dc3545';
+} else {
+    profitWarning.style.display = 'none';
+    profitMarginValue.style.color = '#28a745';
+}
+
+// 利润颜色设置
+if (profit >= 0) {
+    profitValue.style.color = '#28a745';
+} else {
+    profitValue.style.color = '#dc3545';
+}
+
+// 更新国际运费计算详情
+updateShippingDetail(productType, productWeight, shippingCost, selectedRule, calculationDetails);
+}
+
+// 更新国际运费计算详情
+function updateShippingDetail(productType, productWeight, shippingCost, selectedRule, calculationDetails) {
+if (!selectedRule) return;
+
+let html = `
+    <div class="shipping-rule">
+        <div class="shipping-label">产品类型：</div>
+        <div class="shipping-value">${productType.name}</div>
+    </div>
+    <div class="shipping-rule">
+        <div class="shipping-label">产品重量：</div>
+        <div class="shipping-value">${productWeight.toFixed(2)} kg</div>
+    </div>
+    <div class="shipping-rule">
+        <div class="shipping-label">适用规则：</div>
+        <div class="shipping-value">${selectedRule.description}</div>
+    </div>
+    <div class="shipping-rule">
+        <div class="shipping-label">运费公式：</div>
+        <div class="shipping-value">${selectedRule.formulaText}</div>
+    </div>
+`;
+
+if (calculationDetails) {
+    html += `
+        <div class="shipping-formula">
+            计算过程：${calculationDetails}
+        </div>
+    `;
+}
+
+html += `
+    <div class="shipping-rule">
+        <div class="shipping-label">国际运费：</div>
+        <div class="shipping-value" style="font-weight: 700; color: #0057b8;">${shippingCost.toFixed(2)} 人民币</div>
+    </div>
+`;
+
+shippingDetailContent.innerHTML = html;
+}
+
+// 初始化：设置英国站点为默认
+switchSite('uk');
+</script>
